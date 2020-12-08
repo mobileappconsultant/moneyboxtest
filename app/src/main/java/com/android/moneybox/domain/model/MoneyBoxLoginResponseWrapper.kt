@@ -7,4 +7,12 @@ class MoneyBoxLoginResponseWrapper {
     var informationMessage: String? = null
 }
 
+fun MoneyBoxLoginResponseWrapper.initializeFromResponse(moneyBoxLoginResponse: MoneyBoxLoginResponse): MoneyBoxLoginResponseWrapper {
+    this.actionMessage = moneyBoxLoginResponse?.ActionMessage
+    this.session = moneyBoxLoginResponse?.Session
+    this.user = moneyBoxLoginResponse?.User
+    this.informationMessage = moneyBoxLoginResponse?.InformationMessage
+    return this
+}
+
 

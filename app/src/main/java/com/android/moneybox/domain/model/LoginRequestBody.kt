@@ -15,8 +15,3 @@ data class LoginRequestBody(
     @Expose
     val Idfa: String = "ANYTHING"
 }
-
-/*
-* @startuml
-* [*]--> IDLE
-* */

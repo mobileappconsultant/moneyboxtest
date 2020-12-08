@@ -1,28 +1,32 @@
 package com.android.moneybox.presentation
 
 import androidx.lifecycle.ViewModel
+import com.android.moneybox.domain.SchedulerProvider
+import com.android.moneybox.domain.model.LoginRequestBody
 import com.android.moneybox.domain.mvi.MoneyBoxProcessorWrapper
 import com.android.moneybox.domain.mvi.moneyboxactions.MoneyBoxAction
 import com.android.moneybox.domain.mvi.moneyboxresult.MoneyBoxActionResult
 import com.android.moneybox.domain.mvi.moneyboxviewstates.AuthenticationViewState
 import com.android.moneybox.domain.mvi.moneyintents.MoneyBoxIntent
 import com.android.moneybox.domain.mvi.mvibase.MviViewModel
-import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.Observable
+import io.reactivex.functions.BiFunction
 import io.reactivex.subjects.PublishSubject
 import timber.log.Timber
 import javax.inject.Inject
 
 class MoneyBoxMviViewModel @Inject constructor(
-    private val moneyBoxProcessorWrapper: MoneyBoxProcessorWrapper
+    private val moneyBoxProcessorWrapper: MoneyBoxProcessorWrapper,
+    private val appSchedulerProvider: SchedulerProvider
 ) : ViewModel(), MviViewModel<MoneyBoxIntent, AuthenticationViewState> {
     private val intentsSubject =
-        PublishSubject.create<MoneyBoxIntent>()
-    private val stateObservable: io.reactivex.Observable<AuthenticationViewState> = bindIntent()
+     PublishSubject.create<MoneyBoxIntent>()
+    private val stateObservable: Observable<AuthenticationViewState> = bindIntent()
 
 
-    private fun bindIntent(): io.reactivex.Observable<AuthenticationViewState> {
+    private fun bindIntent(): Observable<AuthenticationViewState> {
         return intentsSubject
-            .observeOn(AndroidSchedulers.mainThread())
+            .observeOn(appSchedulerProvider.ui())
             .doOnNext { Timber.i("Tracking raw intent $it") }
             .initialFilter()
             .doOnNext { Timber.i("Tracking filtered intent $it") }
@@ -35,8 +39,8 @@ class MoneyBoxMviViewModel @Inject constructor(
     }
 
 
-    private fun io.reactivex.Observable<MoneyBoxIntent>.initialFilter() = publish { intent ->
-        io.reactivex.Observable.merge(
+    private fun Observable<MoneyBoxIntent>.initialFilter() = publish { intent ->
+        Observable.merge(
             intent.ofType(MoneyBoxIntent.InitialIntent::class.java).take(1),
             intent.filter { !MoneyBoxIntent.InitialIntent::class.java.isInstance(it) }
         )
@@ -46,7 +50,13 @@ class MoneyBoxMviViewModel @Inject constructor(
         return when (intent) {
             is MoneyBoxIntent.InitialIntent -> MoneyBoxAction.Load//default action
             is MoneyBoxIntent.LoginIntent -> {
-                MoneyBoxAction.LoginAction(intent.loginRequestBody)
+                /* // MoneyBoxAction.LoginAction(intent.loginRequestBody)*/
+                MoneyBoxAction.LoginAction(
+                    LoginRequestBody(
+                        "jaeren+androidtest@moneyboxapp.com",
+                        "P455word12"
+                    )
+                )
             }
             is MoneyBoxIntent.GetAllInvestorProductsIntent -> MoneyBoxAction.GetAllInvestorProductsAction
             is MoneyBoxIntent.MakeOneOffPaymentIntent -> MoneyBoxAction.MakeOneOffPaymentAction
@@ -56,15 +66,15 @@ class MoneyBoxMviViewModel @Inject constructor(
     }
 
 
-    override fun processIntents(intents: io.reactivex.Observable<MoneyBoxIntent>) {
+    override fun processIntents(intents: Observable<MoneyBoxIntent>) {
         intents.subscribe(intentsSubject)
     }
 
-    override fun states(): io.reactivex.Observable<AuthenticationViewState> = stateObservable
+    override fun states(): Observable<AuthenticationViewState> = stateObservable
 
     companion object {
-        val reducer: io.reactivex.functions.BiFunction<AuthenticationViewState, MoneyBoxActionResult, AuthenticationViewState> =
-            io.reactivex.functions.BiFunction { previousState: AuthenticationViewState, result: MoneyBoxActionResult ->
+        val reducer: BiFunction<AuthenticationViewState, MoneyBoxActionResult, AuthenticationViewState> =
+            BiFunction { previousState: AuthenticationViewState, result: MoneyBoxActionResult ->
                 when (result) {
                     is MoneyBoxActionResult.InitResult -> previousState
                     is MoneyBoxActionResult.LoginResult -> {

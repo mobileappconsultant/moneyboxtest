@@ -1,14 +1,12 @@
 package com.android.moneybox
 
 import com.android.moneybox.domain.SchedulerProvider
-import io.reactivex.rxjava3.core.Scheduler
-import io.reactivex.rxjava3.schedulers.TestScheduler
 
-class TestSchedulerProvider constructor(private val testScheduler: TestScheduler) :
+class TestSchedulerProvider :
     SchedulerProvider {
-    override fun ui(): Scheduler = testScheduler
-    override fun computation(): Scheduler = testScheduler
-    override fun io(): Scheduler = testScheduler
+    override fun ui() = io.reactivex.rxjava3.schedulers.Schedulers.trampoline()
+    override fun computation() = io.reactivex.rxjava3.schedulers.Schedulers.trampoline()
+    override fun io() = io.reactivex.rxjava3.schedulers.Schedulers.trampoline()
 }
 
 

@@ -1,6 +1,7 @@
 package com.android.moneybox.domain
 
-import io.reactivex.rxjava3.core.Scheduler
+import io.reactivex.Scheduler
+
 
 interface SchedulerProvider {
     fun ui(): Scheduler

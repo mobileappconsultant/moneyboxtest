@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <color name="colorPrimary">#4666FF</color>
-  <color name="colorPrimaryDark">#004012</color>
-  <color name="colorAccent">#c75f00</color>
-
   <color name="titleColor">#000000</color>
   <color name="subTitleColor">#090909</color>
   <color name="noInternetButtonTextColor">#000000</color>
+
+  <color name="colorPrimary">@color/white</color>
+  <color name="colorPrimaryDark">#546270</color>
+  <color name="colorAccent">#49bfbd</color>
+  <color name="white">#ffffff</color>
+  <color name="light_grey">#dde0e2</color>
+  <color name="text_button_primary">@color/white</color>
+  <color name="button_background">#00c2b5</color>
+  <color name="aqua_50">#7F00c2b5</color>
 </resources>

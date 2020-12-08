@@ -1,11 +1,11 @@
 package com.android.moneybox.domain
 
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Scheduler
-import io.reactivex.rxjava3.schedulers.Schedulers
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
+
 
 class AppSchedulerProvider : SchedulerProvider {
-    override fun ui(): Scheduler = AndroidSchedulers.mainThread()
-    override fun computation(): Scheduler = Schedulers.computation()
-    override fun io(): Scheduler = Schedulers.io()
+    override fun ui() = AndroidSchedulers.mainThread()
+    override fun computation() = Schedulers.computation()
+    override fun io() = Schedulers.io()
 }

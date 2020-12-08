@@ -7,10 +7,7 @@ import com.android.moneybox.domain.mvi.moneyboxactions.MoneyBoxAction.LoginActio
 import com.android.moneybox.domain.mvi.moneyboxresult.MoneyBoxActionResult
 import com.android.moneybox.domain.mvi.moneyboxresult.MoneyBoxActionResult.LoginResult
 import com.android.moneybox.domain.repository.MoenyBoxApiRepository
-import io.reactivex.Observable
 import io.reactivex.ObservableTransformer
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
 class MoneyBoxProcessorWrapper @Inject constructor(
@@ -24,22 +21,20 @@ class MoneyBoxProcessorWrapper @Inject constructor(
     private val loginProcessor =
         ObservableTransformer<LoginAction, LoginResult> { action ->
             action.flatMap {
-                repository.login(it.loginRequestBody)?.toObservable()
+                repository.login(it.loginRequestBody)
                     ?.map { loginResponse -> LoginResult.Success(loginResponse) }
                     ?.cast(LoginResult::class.java)
                     ?.onErrorReturn(LoginResult::Failure)
-                    ?.subscribeOn(Schedulers.io())
-                    ?.observeOn(AndroidSchedulers.mainThread())
-                    ?.subscribeOn(Schedulers.io())
+                    ?.subscribeOn(appSchedulerProvider.io())
+                    ?.observeOn(appSchedulerProvider.ui())
                     ?.startWith(LoginResult.Loading)
             }
         }
 
-
     private val investorProductProcessor =
         ObservableTransformer<MoneyBoxAction.GetAllInvestorProductsAction, MoneyBoxActionResult.GetInvestorProdcutsResult> { actions ->
             actions.flatMap {
-                repository.getInvestorProducts().toObservable()
+                repository.getInvestorProducts()
                     .map { investorProducts ->
                         MoneyBoxActionResult.GetInvestorProdcutsResult.Success(
                             investorProducts
@@ -47,8 +42,8 @@ class MoneyBoxProcessorWrapper @Inject constructor(
                     }
                     .cast(MoneyBoxActionResult.GetInvestorProdcutsResult::class.java)
                     .onErrorReturn(MoneyBoxActionResult.GetInvestorProdcutsResult::Failure)
-                    ?.subscribeOn(Schedulers.io())
-                    ?.observeOn(AndroidSchedulers.mainThread())
+                    ?.subscribeOn(appSchedulerProvider.io())
+                    ?.observeOn(appSchedulerProvider.ui())
                     ?.startWith(MoneyBoxActionResult.GetInvestorProdcutsResult.Loading)
             }
         }
@@ -57,7 +52,7 @@ class MoneyBoxProcessorWrapper @Inject constructor(
     private val oneOffPaymentProcessor =
         ObservableTransformer<MoneyBoxAction.MakeOneOffPaymentAction, MoneyBoxActionResult.OneOfPaymentResult> { actions ->
             actions.flatMap {
-                repository.makeOneOffPayment(makeOneOffPaymentRequest)?.toObservable()
+                repository.makeOneOffPayment(makeOneOffPaymentRequest)
                     ?.map { oneOffPaymentResult ->
                         MoneyBoxActionResult.OneOfPaymentResult.Success(
                             oneOffPaymentResult
@@ -65,8 +60,8 @@ class MoneyBoxProcessorWrapper @Inject constructor(
                     }
                     ?.cast(MoneyBoxActionResult.OneOfPaymentResult::class.java)
                     ?.onErrorReturn(MoneyBoxActionResult.OneOfPaymentResult::Failure)
-                    ?.subscribeOn(Schedulers.io())
-                    ?.observeOn(AndroidSchedulers.mainThread())
+                    ?.subscribeOn(appSchedulerProvider.io())
+                    ?.observeOn(appSchedulerProvider.ui())
                     ?.startWith(MoneyBoxActionResult.OneOfPaymentResult.Loading)
             }
         }
@@ -83,7 +78,7 @@ class MoneyBoxProcessorWrapper @Inject constructor(
                          actionObservable.ofType(MoneyBoxAction.GetAllInvestorProductsAction::class.java)
                              .compose(investorProductProcessor)*/
 
-                Observable.merge(
+                io.reactivex.Observable.merge(
                     actionObservable.ofType(LoginAction::class.java)
                         .compose(loginProcessor),
                     actionObservable.ofType(MoneyBoxAction.MakeOneOffPaymentAction::class.java)

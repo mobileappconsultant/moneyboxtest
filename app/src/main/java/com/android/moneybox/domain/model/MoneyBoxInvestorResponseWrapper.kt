@@ -21,3 +21,23 @@ class MoneyBoxInvestorResponseWrapper {
 
 
 }
+
+fun MoneyBoxInvestorResponseWrapper.initializeFromResponse(moneyBoxInvestorResponse: GetInvestorResponse): MoneyBoxInvestorResponseWrapper {
+    this.moneyboxEndOfTaxYear = moneyBoxInvestorResponse?.moneyboxEndOfTaxYear
+
+    this.totalPlanValue = moneyBoxInvestorResponse?.totalPlanValue
+
+
+    this.totalEarnings = moneyBoxInvestorResponse?.totalEarnings
+
+    this.totalContributionsNet = moneyBoxInvestorResponse?.totalContributionsNet
+
+    this.totalEarningsAsPercentage = moneyBoxInvestorResponse?.totalEarningsAsPercentage
+
+
+    this.productResponses = moneyBoxInvestorResponse?.productResponses
+
+
+    this.accounts = moneyBoxInvestorResponse?.accounts
+    return this
+}
