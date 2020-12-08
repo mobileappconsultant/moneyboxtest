@@ -55,14 +55,14 @@ android {
 dependencies {
 
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-// https://mvnrepository.com/artifact/androidx.lifecycle/lifecycle-reactivestreams
-    implementation("androidx.lifecycle:lifecycle-reactivestreams:2.2.0-beta01")
 
-    implementation ("io.reactivex.rxjava2:rxjava:2.1.10")
-    implementation ("io.reactivex.rxjava2:rxandroid:2.0.2")
-    implementation ("io.reactivex.rxjava2:rxkotlin:2.2.0")
-    implementation ("com.squareup.retrofit2:adapter-rxjava2:2.4.0")
-    implementation ("com.squareup.retrofit2:converter-gson:2.4.0")
+    implementation("androidx.lifecycle:lifecycle-reactivestreams:2.3.0-beta01")
+    implementation("io.reactivex.rxjava2:rxjava:2.2.20")
+    implementation ("io.reactivex.rxjava2:rxandroid:2.1.1")
+    implementation("io.reactivex.rxjava2:rxkotlin:2.4.0")
+    implementation("com.squareup.retrofit2:adapter-rxjava2:2.9.0")
+    implementation("com.airbnb.android:lottie:3.5.0")
+    implementation( "androidx.constraintlayout:constraintlayout:2.1.0-alpha1")
 
     implementation(AppCoreDependencies.appLibraries)
     testImplementation(TestImplementationDependencies.testLibraries)

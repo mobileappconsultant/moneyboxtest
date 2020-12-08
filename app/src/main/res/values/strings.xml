@@ -5,6 +5,7 @@
   <string name="prompt_password">Password</string>
   <string name="prompt_full_name">Full Name (optional)</string>
   <string name="action_sign_in">Sign in</string>
+  <string name="action_get_investor_products">Retrieve Products</string>
   <string name="action_sign_in_short">Sign in</string>
   <string name="error_incorrect_password">This password is incorrect</string>
   <string name="email_address_error">Please enter a correct email address</string>

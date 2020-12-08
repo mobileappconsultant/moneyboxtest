@@ -41,7 +41,7 @@ class MoneyBoxApiModule {
 
     @Provides
     @Singleton
-    fun providesBreakingBadApiClient(httpLoggingInterceptor: HttpLoggingInterceptor): OkHttpClient {
+    fun providesApiClient(httpLoggingInterceptor: HttpLoggingInterceptor): OkHttpClient {
         return OkHttpClient().newBuilder()
             .addInterceptor(TokenInterceptor())
             .addInterceptor(httpLoggingInterceptor)
@@ -51,7 +51,7 @@ class MoneyBoxApiModule {
 
     @Provides
     @Singleton
-    fun provideBreakingbadRetrofitClient(
+    fun provideRetrofitClient(
         okHttpClient: OkHttpClient
     ): Retrofit {
         val gsonBuilder = GsonBuilder().setPrettyPrinting().serializeNulls()
@@ -71,7 +71,7 @@ class MoneyBoxApiModule {
 
     @Provides
     @Singleton
-    fun providesBreakingBadRetrofit(retrofit: Retrofit): MoneyBoxApiService {
+    fun providesRetrofit(retrofit: Retrofit): MoneyBoxApiService {
         return retrofit.create(MoneyBoxApiService::class.java)
     }
 

@@ -12,6 +12,7 @@ import com.android.moneybox.MoneyBoxApplication.Companion.application
 import com.android.moneybox.R
 import com.android.moneybox.common.ConnectivityLiveData
 import com.android.moneybox.domain.model.LoginRequestBody
+import com.android.moneybox.domain.model.User
 import com.android.moneybox.domain.mvi.moneyboxviewstates.AuthenticationViewState
 import com.android.moneybox.domain.mvi.moneyintents.MoneyBoxIntent
 import com.android.moneybox.domain.mvi.mvibase.MviView
@@ -43,7 +44,7 @@ class MoneyBoxFragment : Fragment(R.layout.activity_login),
     var passwordValidationComplete: Boolean = false
     var disposables: CompositeDisposable =
         CompositeDisposable()
-
+    private val accountAdapter: AccountsAdapter by lazy { AccountsAdapter() }
     val loginBodyObservable: Observable<LoginRequestBody>
         get() = loginRequestBodySubject
 
@@ -70,28 +71,31 @@ class MoneyBoxFragment : Fragment(R.layout.activity_login),
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        btn_sign_in.clicks().map {
-            loginRequestBodySubject.onNext(loginRequestBody!!)
-        }.subscribe()
-
-        /*
-        investorButton.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(v: View?) {
-                investorRequestSubject.onNext("")
-            }
-
-        })*/
-
         animation = view.findViewById(R.id.animation)
         bind()
+    }
+
+    fun enableDisableAuthFields(shouldEnable: Boolean) {
+        et_password.isEnabled = shouldEnable
+        et_email.isEnabled = shouldEnable
+        til_name.isEnabled = shouldEnable
     }
 
     private fun bind() {
         disposables.add(moneyBoxMviViewModel.states().subscribe(this::render))
         moneyBoxMviViewModel.processIntents(intents())
+        disposables.add(accountAdapter.accountObservable.subscribe {
+            //show new Fragment
+        })
+        btn_sign_in.clicks().map {
+            enableDisableAuthFields(false)
+            loginRequestBodySubject.onNext(loginRequestBody!!)
+        }.subscribe()
+        get_investor_products.clicks().map {
+            investorRequestSubject.onNext("")
+        }.subscribe()
         validateForm()
         loginRequestBodySubject.doOnSubscribe { disposables.add(it) }
-        loginRequestBodySubject.subscribe()
         investorRequestSubject.doOnSubscribe { disposables.add(it) }
     }
 
@@ -166,17 +170,28 @@ class MoneyBoxFragment : Fragment(R.layout.activity_login),
 
         animation.playAnimation()
         state.loginResponse?.let {
-            Toast.makeText(activity, "Logged In", Toast.LENGTH_SHORT).show()
-            state?.loginResponse?.session?.let {
-                MoneyBoxApplication.token = state.loginResponse.session?.BearerToken!!
-            }
-
+            user_name.setText(extractUserName(it.user!!))
+            Toast.makeText(activity, "User Logged In", Toast.LENGTH_SHORT).show()
+            MoneyBoxApplication.token = state.loginResponse.session?.BearerToken!!
+            btn_sign_in.visibility = View.GONE
+            investor_products.visibility = View.VISIBLE
         }
 
         state.investorResponse?.let {
+            total_plan.apply {
+                visibility = View.VISIBLE
+                setText(extractTotalPlan(it.totalPlanValue))
+            }
+            switchViews()
+            investor_products.apply {
+                adapter = accountAdapter
+                hasFixedSize()
+            }
+            accountAdapter.updateData(it.accounts!!)
             Toast.makeText(activity, "Investor Data", Toast.LENGTH_SHORT).show()
         }
         state.error?.let {
+            enableDisableAuthFields(true)
             Toast.makeText(activity, "Error Occured", Toast.LENGTH_SHORT).show()
         }
 
@@ -187,6 +202,21 @@ class MoneyBoxFragment : Fragment(R.layout.activity_login),
         val regex = "^(.+)@(.+)$"
         val pattern: Pattern = Pattern.compile(regex)
         return pattern.matcher(this).matches()
+    }
+
+    fun extractTotalPlan(totalPlan: Double?): String {
+        return "Total Plan Value: ".plus(totalPlan.toString())
+    }
+
+    fun extractUserName(user: User): String {
+        return "Hello ".plus(user?.FirstName.plus(" ").plus(user?.LastName))
+    }
+
+
+    fun switchViews() {
+        auth_view.visibility = View.GONE
+        investor_products.visibility = View.VISIBLE
+        button_holder.visibility = View.GONE
     }
 
     companion object {

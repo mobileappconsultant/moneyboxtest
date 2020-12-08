@@ -6,8 +6,8 @@ import com.android.moneybox.domain.mvi.mvibase.MviViewState
 
 data class AuthenticationViewState(
     val isLoading: Boolean = false,
-    val loginResponse: MoneyBoxLoginResponseWrapper? = MoneyBoxLoginResponseWrapper(),
-    val investorResponse: MoneyBoxInvestorResponseWrapper? = MoneyBoxInvestorResponseWrapper(),
+    val loginResponse: MoneyBoxLoginResponseWrapper? = null,
+    val investorResponse: MoneyBoxInvestorResponseWrapper? = null,
     val error: Throwable? =null
 ) : MviViewState {
     companion object {
